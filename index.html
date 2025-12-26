@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rymal Variety - Employee Attendance</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Rymal Variety</h1>
+            <h2>Employee Attendance System</h2>
+            <div id="currentDate"></div>
+        </header>
+
+        <main>
+            <!-- Add Employee Section -->
+            <section class="add-employee-section">
+                <h3>Add New Employee</h3>
+                <div class="add-employee-form">
+                    <input type="text" id="newEmployeeName" placeholder="Enter employee name">
+                    <button onclick="addEmployee()" class="btn-add">Add Employee</button>
+                </div>
+                <div id="addMessage" class="message"></div>
+            </section>
+
+            <!-- Attendance Section -->
+            <section class="attendance-section">
+                <h3>Mark Attendance</h3>
+                <div id="employeeList" class="employee-list"></div>
+            </section>
+
+            <!-- Summary Section -->
+            <section class="summary-section">
+                <h3>Today's Summary</h3>
+                <div id="summary" class="summary">
+                    <div class="summary-item">
+                        <span>Total Employees:</span>
+                        <span id="totalEmployees">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Present:</span>
+                        <span id="presentCount" class="present-text">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Absent:</span>
+                        <span id="absentCount" class="absent-text">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Not Marked:</span>
+                        <span id="notMarkedCount">0</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Attendance History -->
+            <section class="history-section">
+                <h3>Attendance History</h3>
+                <div class="history-controls">
+                    <input type="date" id="historyDate" onchange="loadHistory()">
+                    <button onclick="clearAllData()" class="btn-clear">Clear All Data</button>
+                </div>
+                <div id="historyList" class="history-list"></div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Rymal Variety. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
