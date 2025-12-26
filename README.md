@@ -2,6 +2,8 @@
 
 A simple and user-friendly web-based employee attendance tracking system for Rymal Variety.
 
+📱 **Can be installed as a mobile app!** See [INSTALL-MOBILE.md](INSTALL-MOBILE.md) for installation instructions.
+
 ## Features
 
 - **Pre-loaded Employees**: Comes with 4 default employees (Naveen, Damini, Muskan, and Lina)
@@ -12,12 +14,30 @@ A simple and user-friendly web-based employee attendance tracking system for Rym
 - **Delete Employees**: Remove employees from the system
 - **Data Persistence**: All data is stored locally in your browser
 - **Responsive Design**: Works on desktop, tablet, and mobile devices
+- **📱 Progressive Web App (PWA)**: Install on mobile devices like a native app
+- **Offline Support**: Works without internet connection after installation
+- **Fullscreen Mode**: Runs like a native app on mobile devices
+
+## Installation
+
+### For Desktop/Browser Use
+
+1. Open `index.html` in your web browser
+2. The app will automatically load with 4 default employees
+
+### For Mobile App Installation
+
+📱 **Want to use this as a mobile app?**
+
+See the detailed installation guide: **[INSTALL-MOBILE.md](INSTALL-MOBILE.md)**
+
+The app can be installed on Android and iOS devices just like a native app!
 
 ## How to Use
 
 ### Getting Started
 
-1. Open `index.html` in your web browser
+1. Open the app in your web browser or mobile device
 2. The app will automatically load with 4 default employees
 
 ### Adding New Employees
@@ -51,6 +71,10 @@ A simple and user-friendly web-based employee attendance tracking system for Rym
 - `index.html` - Main application structure
 - `styles.css` - Styling and responsive design
 - `script.js` - Application logic and data management
+- `manifest.json` - PWA configuration for mobile installation
+- `service-worker.js` - Enables offline functionality
+- `icon.svg` - App icon (vector format)
+- `generate-icons.html` - Tool to create PNG icons for better mobile support
 
 ### Data Storage
 

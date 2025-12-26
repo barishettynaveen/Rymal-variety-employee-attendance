@@ -4,6 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rymal Variety - Employee Attendance</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Employee Attendance Tracking System for Rymal Variety">
+    <meta name="theme-color" content="#667eea">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Rymal Attendance">
+
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="icon-152.png">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -71,5 +90,36 @@
     </div>
 
     <script src="script.js"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered successfully:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
+
+        // Install prompt
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // Show install button if you want to add one
+            console.log('App can be installed');
+        });
+
+        window.addEventListener('appinstalled', () => {
+            console.log('App installed successfully');
+            deferredPrompt = null;
+        });
+    </script>
 </body>
 </html>
