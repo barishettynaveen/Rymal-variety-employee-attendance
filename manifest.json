@@ -2,7 +2,7 @@
   "name": "Rymal Variety Employee Attendance",
   "short_name": "Rymal Attendance",
   "description": "Employee Attendance Tracking System for Rymal Variety",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#667eea",
@@ -69,7 +69,7 @@
       "name": "Mark Attendance",
       "short_name": "Attendance",
       "description": "Mark employee attendance",
-      "url": "/index.html",
+      "url": "./index.html",
       "icons": [{ "src": "icon-96.png", "sizes": "96x96" }]
     }
   ]

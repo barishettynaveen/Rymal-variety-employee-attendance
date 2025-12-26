@@ -1,10 +1,11 @@
 const CACHE_NAME = 'rymal-attendance-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/script.js',
-  '/manifest.json'
+  './',
+  './index.html',
+  './styles.css',
+  './script.js',
+  './manifest.json',
+  './icon.svg'
 ];
 
 // Install event - cache resources
