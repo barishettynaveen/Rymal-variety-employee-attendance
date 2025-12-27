@@ -26,67 +26,104 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Rymal Variety</h1>
-            <h2>Employee Attendance System</h2>
-            <div id="currentDate"></div>
-        </header>
+    <div class="app-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>Rymal Variety</h1>
+                <p class="tagline">Attendance System</p>
+            </div>
 
-        <main>
+            <!-- Live Clock -->
+            <div class="clock-widget">
+                <div class="current-time" id="currentTime">00:00:00</div>
+                <div class="current-date" id="currentDate">Loading...</div>
+                <div class="current-shift" id="currentShift">No Active Shift</div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="quick-stats">
+                <h3>Today's Stats</h3>
+                <div class="stat-item">
+                    <span class="stat-label">Total Employees</span>
+                    <span class="stat-value" id="totalEmployees">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Punched In</span>
+                    <span class="stat-value present-text" id="punchedInCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Punched Out</span>
+                    <span class="stat-value" id="punchedOutCount">0</span>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" onclick="showSection('attendance')">
+                    <span>Attendance</span>
+                </button>
+                <button class="nav-btn" onclick="showSection('history')">
+                    <span>History</span>
+                </button>
+                <button class="nav-btn" onclick="showSection('addEmployee')">
+                    <span>Add Employee</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+                <h2>Welcome to Rymal Variety</h2>
+                <p>Manage employee attendance with ease</p>
+            </div>
+
+            <!-- Shift Information -->
+            <div class="shift-info">
+                <div class="shift-card">
+                    <h4>Morning Shift</h4>
+                    <p class="shift-time">7:00 AM - 2:00 PM</p>
+                </div>
+                <div class="shift-card">
+                    <h4>Evening Shift</h4>
+                    <p class="shift-time">2:00 PM - 10:00 PM</p>
+                </div>
+            </div>
+
+            <!-- Attendance Section -->
+            <section id="attendanceSection" class="content-section active">
+                <h3>Employee Attendance</h3>
+                <div id="employeeList" class="employee-list"></div>
+            </section>
+
             <!-- Add Employee Section -->
-            <section class="add-employee-section">
+            <section id="addEmployeeSection" class="content-section">
                 <h3>Add New Employee</h3>
                 <div class="add-employee-form">
-                    <input type="text" id="newEmployeeName" placeholder="Enter employee name">
-                    <button onclick="addEmployee()" class="btn-add">Add Employee</button>
+                    <input type="text" id="newEmployeeName" placeholder="Enter employee name" class="form-input">
+                    <select id="employeeShift" class="form-input">
+                        <option value="">Select Shift</option>
+                        <option value="morning">Morning Shift (7:00 AM - 2:00 PM)</option>
+                        <option value="evening">Evening Shift (2:00 PM - 10:00 PM)</option>
+                    </select>
+                    <button onclick="addEmployee()" class="btn-primary">Add Employee</button>
                 </div>
                 <div id="addMessage" class="message"></div>
             </section>
 
-            <!-- Attendance Section -->
-            <section class="attendance-section">
-                <h3>Mark Attendance</h3>
-                <div id="employeeList" class="employee-list"></div>
-            </section>
-
-            <!-- Summary Section -->
-            <section class="summary-section">
-                <h3>Today's Summary</h3>
-                <div id="summary" class="summary">
-                    <div class="summary-item">
-                        <span>Total Employees:</span>
-                        <span id="totalEmployees">0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Present:</span>
-                        <span id="presentCount" class="present-text">0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Absent:</span>
-                        <span id="absentCount" class="absent-text">0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Not Marked:</span>
-                        <span id="notMarkedCount">0</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Attendance History -->
-            <section class="history-section">
+            <!-- History Section -->
+            <section id="historySection" class="content-section">
                 <h3>Attendance History</h3>
                 <div class="history-controls">
-                    <input type="date" id="historyDate" onchange="loadHistory()">
-                    <button onclick="clearAllData()" class="btn-clear">Clear All Data</button>
+                    <input type="date" id="historyDate" class="form-input" onchange="loadHistory()">
+                    <button onclick="exportHistory()" class="btn-secondary">Export Data</button>
+                    <button onclick="clearAllData()" class="btn-danger">Clear All Data</button>
                 </div>
                 <div id="historyList" class="history-list"></div>
             </section>
         </main>
-
-        <footer>
-            <p>&copy; 2024 Rymal Variety. All rights reserved.</p>
-        </footer>
     </div>
 
     <script src="script.js"></script>
@@ -111,8 +148,6 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-
-            // Show install button if you want to add one
             console.log('App can be installed');
         });
 

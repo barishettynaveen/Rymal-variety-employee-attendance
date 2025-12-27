@@ -1,45 +1,79 @@
-// Initialize the app when DOM is loaded
+// Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
+    startClock();
+    updateCurrentShift();
+    setInterval(updateCurrentShift, 60000); // Update shift every minute
 });
 
 // Initialize default employees and load data
 function initializeApp() {
-    // Check if employees exist in localStorage
     let employees = getEmployees();
 
-    // If no employees exist, add default employees
+    // If no employees exist, add default employees with shifts
     if (employees.length === 0) {
-        const defaultEmployees = ['Naveen', 'Damini', 'Muskan', 'Lina'];
-        defaultEmployees.forEach(name => {
+        const defaultEmployees = [
+            { name: 'Naveen', shift: 'morning' },
+            { name: 'Damini', shift: 'evening' },
+            { name: 'Muskan', shift: 'morning' },
+            { name: 'Lina', shift: 'evening' }
+        ];
+
+        defaultEmployees.forEach(emp => {
             employees.push({
                 id: generateId(),
-                name: name
+                name: emp.name,
+                shift: emp.shift
             });
         });
         saveEmployees(employees);
     }
 
-    // Display current date
-    updateCurrentDate();
-
-    // Load and display employees
     displayEmployees();
-
-    // Update summary
-    updateSummary();
-
-    // Set today's date in history date picker
+    updateStats();
     document.getElementById('historyDate').valueAsDate = new Date();
     loadHistory();
 }
 
-// Update current date display
-function updateCurrentDate() {
-    const dateElement = document.getElementById('currentDate');
+// Live Clock
+function startClock() {
+    updateClock();
+    setInterval(updateClock, 1000);
+}
+
+function updateClock() {
+    const now = new Date();
+
+    // Update time
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('currentTime').textContent = `${hours}:${minutes}:${seconds}`;
+
+    // Update date
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    const today = new Date().toLocaleDateString('en-US', options);
-    dateElement.textContent = today;
+    document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+}
+
+// Detect and display current shift
+function updateCurrentShift() {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const currentTime = hours + minutes / 60;
+
+    const shiftElement = document.getElementById('currentShift');
+
+    if (currentTime >= 7 && currentTime < 14) {
+        shiftElement.textContent = 'Morning Shift (7:00 AM - 2:00 PM)';
+        shiftElement.style.background = 'rgba(33, 150, 243, 0.3)';
+    } else if (currentTime >= 14 && currentTime < 22) {
+        shiftElement.textContent = 'Evening Shift (2:00 PM - 10:00 PM)';
+        shiftElement.style.background = 'rgba(156, 39, 176, 0.3)';
+    } else {
+        shiftElement.textContent = 'No Active Shift';
+        shiftElement.style.background = 'rgba(255, 255, 255, 0.2)';
+    }
 }
 
 // Generate unique ID
@@ -47,47 +81,77 @@ function generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
 
-// Get employees from localStorage
+// LocalStorage helpers
 function getEmployees() {
     const employees = localStorage.getItem('employees');
     return employees ? JSON.parse(employees) : [];
 }
 
-// Save employees to localStorage
 function saveEmployees(employees) {
     localStorage.setItem('employees', JSON.stringify(employees));
 }
 
-// Get attendance for a specific date
 function getAttendance(date) {
     const dateKey = formatDateKey(date);
     const attendance = localStorage.getItem(`attendance_${dateKey}`);
     return attendance ? JSON.parse(attendance) : {};
 }
 
-// Save attendance for a specific date
 function saveAttendance(date, attendance) {
     const dateKey = formatDateKey(date);
     localStorage.setItem(`attendance_${dateKey}`, JSON.stringify(attendance));
 }
 
-// Format date as YYYY-MM-DD
 function formatDateKey(date) {
     const d = new Date(date);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-// Add new employee
+// Section navigation
+function showSection(sectionName) {
+    // Hide all sections
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+    });
+
+    // Remove active class from all nav buttons
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    // Show selected section
+    const sectionMap = {
+        'attendance': 'attendanceSection',
+        'history': 'historySection',
+        'addEmployee': 'addEmployeeSection'
+    };
+
+    document.getElementById(sectionMap[sectionName]).classList.add('active');
+
+    // Set active nav button
+    event.target.classList.add('active');
+
+    // Reload data if needed
+    if (sectionName === 'history') {
+        loadHistory();
+    }
+}
+
+// Add employee
 function addEmployee() {
     const nameInput = document.getElementById('newEmployeeName');
+    const shiftSelect = document.getElementById('employeeShift');
     const name = nameInput.value.trim();
+    const shift = shiftSelect.value;
     const messageDiv = document.getElementById('addMessage');
 
     if (name === '') {
-        showMessage(messageDiv, 'Please enter a valid name', 'error');
+        showMessage(messageDiv, 'Please enter employee name', 'error');
+        return;
+    }
+
+    if (shift === '') {
+        showMessage(messageDiv, 'Please select a shift', 'error');
         return;
     }
 
@@ -102,27 +166,17 @@ function addEmployee() {
     // Add new employee
     employees.push({
         id: generateId(),
-        name: name
+        name: name,
+        shift: shift
     });
 
     saveEmployees(employees);
     nameInput.value = '';
-    showMessage(messageDiv, `${name} added successfully!`, 'success');
+    shiftSelect.value = '';
+    showMessage(messageDiv, `${name} added successfully to ${shift === 'morning' ? 'Morning' : 'Evening'} shift!`, 'success');
 
-    // Refresh display
     displayEmployees();
-    updateSummary();
-}
-
-// Show message
-function showMessage(element, message, type) {
-    element.textContent = message;
-    element.className = `message ${type}`;
-    element.style.display = 'block';
-
-    setTimeout(() => {
-        element.style.display = 'none';
-    }, 3000);
+    updateStats();
 }
 
 // Display employees
@@ -133,7 +187,7 @@ function displayEmployees() {
     const employeeList = document.getElementById('employeeList');
 
     if (employees.length === 0) {
-        employeeList.innerHTML = '<p class="no-history">No employees added yet. Add your first employee above!</p>';
+        employeeList.innerHTML = '<p class="no-history">No employees added yet. Add your first employee!</p>';
         return;
     }
 
@@ -143,32 +197,50 @@ function displayEmployees() {
         const card = document.createElement('div');
         card.className = 'employee-card';
 
-        const status = attendance[employee.id];
-        let statusBadge = '';
-        let presentActive = '';
-        let absentActive = '';
+        const attendanceRecord = attendance[employee.id] || {};
+        const punchIn = attendanceRecord.punchIn || null;
+        const punchOut = attendanceRecord.punchOut || null;
 
-        if (status === 'present') {
-            statusBadge = '<span class="status-badge present">Present</span>';
-            presentActive = 'active';
-        } else if (status === 'absent') {
-            statusBadge = '<span class="status-badge absent">Absent</span>';
-            absentActive = 'active';
-        } else {
-            statusBadge = '<span class="status-badge not-marked">Not Marked</span>';
+        let statusClass = 'not-started';
+        let statusText = 'Not Started';
+
+        if (punchIn && punchOut) {
+            statusClass = 'punched-out';
+            statusText = 'Completed';
+        } else if (punchIn) {
+            statusClass = 'punched-in';
+            statusText = 'Working';
         }
 
+        const shiftText = employee.shift === 'morning' ? 'Morning Shift' : 'Evening Shift';
+        const shiftClass = employee.shift === 'evening' ? 'evening' : '';
+
         card.innerHTML = `
-            <div class="employee-info">
-                <span class="employee-name">${employee.name}</span>
-                ${statusBadge}
+            <div class="employee-header">
+                <div class="employee-info">
+                    <div class="employee-name">${employee.name}</div>
+                    <span class="employee-shift-badge ${shiftClass}">${shiftText}</span>
+                </div>
+                <span class="employee-status ${statusClass}">${statusText}</span>
             </div>
+
+            <div class="punch-times">
+                <div class="punch-time">
+                    <div class="punch-label">Punch In</div>
+                    <div class="punch-value">${punchIn || '--:--'}</div>
+                </div>
+                <div class="punch-time">
+                    <div class="punch-label">Punch Out</div>
+                    <div class="punch-value">${punchOut || '--:--'}</div>
+                </div>
+            </div>
+
             <div class="employee-actions">
-                <button class="btn-present ${presentActive}" onclick="markAttendance('${employee.id}', 'present')">
-                    Present
+                <button class="btn-punch-in" onclick="punchIn('${employee.id}')" ${punchIn ? 'disabled' : ''}>
+                    Punch In
                 </button>
-                <button class="btn-absent ${absentActive}" onclick="markAttendance('${employee.id}', 'absent')">
-                    Absent
+                <button class="btn-punch-out" onclick="punchOut('${employee.id}')" ${!punchIn || punchOut ? 'disabled' : ''}>
+                    Punch Out
                 </button>
                 <button class="btn-delete" onclick="deleteEmployee('${employee.id}', '${employee.name}')">
                     Delete
@@ -180,21 +252,40 @@ function displayEmployees() {
     });
 }
 
-// Mark attendance
-function markAttendance(employeeId, status) {
+// Punch In
+function punchIn(employeeId) {
     const today = new Date();
     const attendance = getAttendance(today);
 
-    // Toggle status if clicking the same button
-    if (attendance[employeeId] === status) {
-        delete attendance[employeeId];
-    } else {
-        attendance[employeeId] = status;
+    const now = new Date();
+    const timeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    if (!attendance[employeeId]) {
+        attendance[employeeId] = {};
     }
 
+    attendance[employeeId].punchIn = timeString;
     saveAttendance(today, attendance);
+
     displayEmployees();
-    updateSummary();
+    updateStats();
+}
+
+// Punch Out
+function punchOut(employeeId) {
+    const today = new Date();
+    const attendance = getAttendance(today);
+
+    const now = new Date();
+    const timeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    if (attendance[employeeId]) {
+        attendance[employeeId].punchOut = timeString;
+        saveAttendance(today, attendance);
+    }
+
+    displayEmployees();
+    updateStats();
 }
 
 // Delete employee
@@ -208,31 +299,34 @@ function deleteEmployee(employeeId, employeeName) {
     saveEmployees(employees);
 
     displayEmployees();
-    updateSummary();
+    updateStats();
     loadHistory();
 }
 
-// Update summary
-function updateSummary() {
+// Update statistics
+function updateStats() {
     const employees = getEmployees();
     const today = new Date();
     const attendance = getAttendance(today);
 
     const total = employees.length;
-    let present = 0;
-    let absent = 0;
+    let punchedIn = 0;
+    let punchedOut = 0;
 
     employees.forEach(emp => {
-        if (attendance[emp.id] === 'present') present++;
-        else if (attendance[emp.id] === 'absent') absent++;
+        const record = attendance[emp.id];
+        if (record) {
+            if (record.punchIn && !record.punchOut) {
+                punchedIn++;
+            } else if (record.punchOut) {
+                punchedOut++;
+            }
+        }
     });
 
-    const notMarked = total - present - absent;
-
     document.getElementById('totalEmployees').textContent = total;
-    document.getElementById('presentCount').textContent = present;
-    document.getElementById('absentCount').textContent = absent;
-    document.getElementById('notMarkedCount').textContent = notMarked;
+    document.getElementById('punchedInCount').textContent = punchedIn;
+    document.getElementById('punchedOutCount').textContent = punchedOut;
 }
 
 // Load attendance history
@@ -250,39 +344,76 @@ function loadHistory() {
     }
 
     let hasAttendance = false;
-    let historyHTML = '<h4>Attendance for ' + selectedDate.toLocaleDateString('en-US', {
+    let historyHTML = `<h4>Attendance for ${selectedDate.toLocaleDateString('en-US', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric'
-    }) + '</h4>';
+    })}</h4><br>`;
+
+    // Header
+    historyHTML += `
+        <div class="history-item" style="font-weight: bold; background: #f8f9fa;">
+            <span>Employee</span>
+            <span>Shift</span>
+            <span>Punch In</span>
+            <span>Punch Out</span>
+        </div>
+    `;
 
     employees.forEach(emp => {
-        const status = attendance[emp.id];
-        if (status) {
+        const record = attendance[emp.id];
+        if (record && record.punchIn) {
             hasAttendance = true;
-            const statusClass = status === 'present' ? 'present' : 'absent';
-            const statusText = status.charAt(0).toUpperCase() + status.slice(1);
+            const shiftText = emp.shift === 'morning' ? 'Morning' : 'Evening';
 
             historyHTML += `
                 <div class="history-item">
-                    <span>${emp.name}</span>
-                    <span class="status-badge ${statusClass}">${statusText}</span>
+                    <span><strong>${emp.name}</strong></span>
+                    <span>${shiftText}</span>
+                    <span>${record.punchIn || '--:--'}</span>
+                    <span>${record.punchOut || '--:--'}</span>
                 </div>
             `;
         }
     });
 
     if (!hasAttendance) {
-        historyHTML += '<p class="no-history">No attendance marked for this date.</p>';
+        historyHTML += '<p class="no-history">No attendance records for this date.</p>';
     }
 
     historyList.innerHTML = historyHTML;
 }
 
+// Export history
+function exportHistory() {
+    const employees = getEmployees();
+    const dateInput = document.getElementById('historyDate');
+    const selectedDate = dateInput.value ? new Date(dateInput.value) : new Date();
+    const attendance = getAttendance(selectedDate);
+
+    let csv = 'Employee Name,Shift,Punch In,Punch Out\n';
+
+    employees.forEach(emp => {
+        const record = attendance[emp.id];
+        if (record && record.punchIn) {
+            const shiftText = emp.shift === 'morning' ? 'Morning' : 'Evening';
+            csv += `${emp.name},${shiftText},${record.punchIn || ''},${record.punchOut || ''}\n`;
+        }
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `attendance_${formatDateKey(selectedDate)}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
 // Clear all data
 function clearAllData() {
-    if (!confirm('Are you sure you want to clear all data? This will remove all employees and attendance records. This action cannot be undone!')) {
+    if (!confirm('Are you sure you want to clear all data? This will remove all employees and attendance records.')) {
         return;
     }
 
@@ -294,11 +425,24 @@ function clearAllData() {
     initializeApp();
 }
 
+// Show message
+function showMessage(element, message, type) {
+    element.textContent = message;
+    element.className = `message ${type}`;
+
+    setTimeout(() => {
+        element.className = 'message';
+    }, 4000);
+}
+
 // Allow Enter key to add employee
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('newEmployeeName').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            addEmployee();
-        }
-    });
+    const nameInput = document.getElementById('newEmployeeName');
+    if (nameInput) {
+        nameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addEmployee();
+            }
+        });
+    }
 });
