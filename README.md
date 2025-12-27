@@ -1,106 +1,221 @@
 # Rymal Variety - Employee Attendance System
 
-A simple and user-friendly web-based employee attendance tracking system for Rymal Variety.
+A professional shift-based employee attendance tracking system with Punch In/Punch Out functionality for Rymal Variety.
 
 📱 **Can be installed as a mobile app!** See [INSTALL-MOBILE.md](INSTALL-MOBILE.md) for installation instructions.
 
 ## Features
 
-- **Pre-loaded Employees**: Comes with 4 default employees (Naveen, Damini, Muskan, and Lina)
-- **Add New Employees**: Easily add new employees to the system
-- **Mark Attendance**: Mark employees as Present or Absent for each day
-- **Attendance Summary**: View real-time summary of today's attendance
-- **Attendance History**: Check attendance records for any date
+### Core Features
+- **Welcome Message**: "Welcome to Rymal Variety" banner
+- **Live Sidebar**: Real-time clock, current date, and active shift indicator
+- **Two Working Shifts**:
+  - Morning Shift: 7:00 AM - 2:00 PM
+  - Evening Shift: 2:00 PM - 10:00 PM
+- **Punch In/Punch Out System**: Time-stamped attendance tracking
+- **Shift-Based Management**: Assign employees to specific shifts
+- **Pre-loaded Employees**: 4 default employees (Naveen, Damini, Muskan, Lina)
+- **Add Unlimited Employees**: Add new employees with shift assignment
+- **Real-Time Statistics**: Track punched in/out employees
+- **Attendance History**: View detailed punch records for any date
+- **Export to CSV**: Download attendance data
 - **Delete Employees**: Remove employees from the system
-- **Data Persistence**: All data is stored locally in your browser
-- **Responsive Design**: Works on desktop, tablet, and mobile devices
-- **📱 Progressive Web App (PWA)**: Install on mobile devices like a native app
-- **Offline Support**: Works without internet connection after installation
+
+### Technical Features
+- **Progressive Web App (PWA)**: Install on mobile devices like a native app
+- **Offline Support**: Works without internet after installation
+- **Data Persistence**: All data stored locally in browser
+- **Responsive Design**: Works on desktop, tablet, and mobile
 - **Fullscreen Mode**: Runs like a native app on mobile devices
-
-## Installation
-
-### For Desktop/Browser Use
-
-1. Open `index.html` in your web browser
-2. The app will automatically load with 4 default employees
-
-### For Mobile App Installation
-
-📱 **Want to use this as a mobile app?**
-
-See the detailed installation guide: **[INSTALL-MOBILE.md](INSTALL-MOBILE.md)**
-
-The app can be installed on Android and iOS devices just like a native app!
+- **Live Clock**: Updates every second
+- **Auto Shift Detection**: Automatically shows current active shift
 
 ## How to Use
 
-### Getting Started
+### On Laptop/Desktop
 
-1. Open the app in your web browser or mobile device
-2. The app will automatically load with 4 default employees
+**Option 1: GitHub Pages (Recommended)**
+1. Visit: `https://barishettynaveen.github.io/Rymal-variety-employee-attendance/`
+2. The app will load automatically
+
+**Option 2: Local Server**
+1. Download or clone the repository
+2. Open terminal in the project folder
+3. Run a local server:
+   ```bash
+   # Using Python
+   python -m http.server 8000
+   # or Python 3
+   python3 -m http.server 8000
+
+   # Using Node.js
+   npx serve
+
+   # Using PHP
+   php -S localhost:8000
+   ```
+4. Open browser and go to: `http://localhost:8000`
+
+**Important**: Don't open `index.html` directly by double-clicking! Use a local server or GitHub Pages.
+
+### On Mobile (Android/iOS)
+
+See [INSTALL-MOBILE.md](INSTALL-MOBILE.md) for detailed installation instructions.
+
+Quick steps:
+1. Open the GitHub Pages URL in Safari (iOS) or Chrome (Android)
+2. Tap "Add to Home Screen" or "Install"
+3. Use like a native app!
+
+## Using the App
+
+### Dashboard (Main Screen)
+- **Sidebar** shows:
+  - Live clock and current date
+  - Current active shift
+  - Today's statistics (Total employees, Punched in, Punched out)
+  - Navigation buttons
+
+### Punch In/Out
+1. Click the **Attendance** tab in the sidebar
+2. Find the employee card
+3. Click **Punch In** when they arrive
+4. Click **Punch Out** when they leave
+5. Times are recorded automatically
 
 ### Adding New Employees
+1. Click the **Add Employee** tab in the sidebar
+2. Enter employee name
+3. Select their shift (Morning or Evening)
+4. Click **Add Employee**
 
-1. Enter the employee name in the "Add New Employee" field
-2. Click "Add Employee" button or press Enter
-3. The employee will be added to the attendance list
+### Viewing History
+1. Click the **History** tab in the sidebar
+2. Select a date using the date picker
+3. View all punch in/out records for that date
+4. Click **Export Data** to download CSV
 
-### Marking Attendance
-
-1. For each employee, click either "Present" or "Absent" button
-2. The status will be highlighted and saved automatically
-3. Click the same button again to unmark the attendance
-4. The summary section updates in real-time
-
-### Viewing Attendance History
-
-1. Use the date picker in the "Attendance History" section
-2. Select any date to view attendance records for that day
-3. The history shows all employees who had their attendance marked on that date
-
-### Managing Employees
-
-- **Delete Employee**: Click the "Delete" button next to any employee to remove them
-- **Clear All Data**: Click "Clear All Data" to reset the entire system (requires confirmation)
+### Shift Information
+- **Morning Shift**: 7:00 AM - 2:00 PM (shown in blue)
+- **Evening Shift**: 2:00 PM - 10:00 PM (shown in purple)
+- Sidebar automatically highlights the current active shift
 
 ## Technical Details
 
 ### Files
-
-- `index.html` - Main application structure
-- `styles.css` - Styling and responsive design
-- `script.js` - Application logic and data management
+- `index.html` - Main application with sidebar and sections
+- `styles.css` - Professional styling and responsive design
+- `script.js` - Shift-based attendance logic and punch in/out functionality
 - `manifest.json` - PWA configuration for mobile installation
 - `service-worker.js` - Enables offline functionality
 - `icon.svg` - App icon (vector format)
-- `generate-icons.html` - Tool to create PNG icons for better mobile support
+- `generate-icons.html` - Tool to create PNG icons for mobile
 
 ### Data Storage
-
 The application uses browser's localStorage to store:
-- Employee list
-- Daily attendance records
+- Employee list with shift assignments
+- Daily punch in/out records with timestamps
+- Attendance history
 
 ### Browser Compatibility
-
 Works on all modern browsers that support:
 - HTML5
-- CSS3
+- CSS3 (Grid, Flexbox, Animations)
 - JavaScript ES6
 - localStorage API
+- Service Workers (for PWA features)
+
+**Recommended Browsers:**
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
+
+## Troubleshooting
+
+### App Not Opening on Laptop
+
+**Problem**: Page is blank or not loading
+
+**Solutions**:
+1. **Use a local server** - Don't open index.html directly
+   ```bash
+   python3 -m http.server 8000
+   ```
+   Then open `http://localhost:8000`
+
+2. **Use GitHub Pages** - Access the live version at:
+   ```
+   https://barishettynaveen.github.io/Rymal-variety-employee-attendance/
+   ```
+
+3. **Clear Browser Cache**:
+   - Chrome: Ctrl+Shift+Delete → Clear cached images and files
+   - Firefox: Ctrl+Shift+Delete → Cached Web Content
+   - Safari: Cmd+Option+E
+
+4. **Check Browser Console** (F12):
+   - Look for errors
+   - Make sure JavaScript is enabled
+
+### Data Not Saving
+
+**Problem**: Attendance records disappear after closing browser
+
+**Solutions**:
+- Don't use incognito/private mode
+- Check if localStorage is enabled
+- Don't clear browser data frequently
+- Use the same browser and device
+
+### Mobile Installation Issues
+
+See [INSTALL-MOBILE.md](INSTALL-MOBILE.md) for mobile-specific troubleshooting.
+
+## Default Employees
+
+The app comes with 4 pre-loaded employees:
+- **Naveen** - Morning Shift (7:00 AM - 2:00 PM)
+- **Damini** - Evening Shift (2:00 PM - 10:00 PM)
+- **Muskan** - Morning Shift (7:00 AM - 2:00 PM)
+- **Lina** - Evening Shift (2:00 PM - 10:00 PM)
+
+You can add unlimited additional employees with your preferred shift assignments.
+
+## Data Management
+
+### Exporting Data
+1. Go to **History** tab
+2. Select the date
+3. Click **Export Data**
+4. CSV file will download with format:
+   ```
+   Employee Name, Shift, Punch In, Punch Out
+   ```
+
+### Clearing All Data
+1. Go to **History** tab
+2. Click **Clear All Data**
+3. Confirm twice (this is permanent!)
+4. App resets to default state
 
 ## Notes
 
-- Data is stored locally in your browser
-- Clearing browser data will delete all records
-- No server or internet connection required
-- Each device/browser maintains its own separate data
+- Each browser/device maintains separate data
+- Data is stored locally only (no cloud sync)
+- All times are based on your device's clock
+- Punch times are recorded in HH:MM format (24-hour)
+- Employees can only punch in once per day
+- Employees must punch in before punching out
 
 ## Support
 
-For any issues or questions, please contact the Rymal Variety management team.
+For issues or questions:
+- Check the Troubleshooting section above
+- Ensure you're using a supported browser
+- Try clearing cache and reloading
+- Contact Rymal Variety management team
 
 ---
 
-**Rymal Variety Employee Attendance System** - Simple, Efficient, Reliable
+**Rymal Variety Employee Attendance System** - Professional, Accurate, Reliable
