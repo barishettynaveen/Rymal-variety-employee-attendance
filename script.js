@@ -394,6 +394,67 @@ function formatDateKey(date) {
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 
+// ============================================
+// SECTION NAVIGATION
+// ============================================
+
+function showSection(sectionName) {
+    // Hide all sections
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+    });
+
+    // Remove active class from all nav buttons
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    // Show selected section
+    const sectionMap = {
+        'dashboard': 'dashboardSection',
+        'punchInOut': 'punchInOutSection',
+        'history': 'historySection',
+        'reports': 'reportsSection',
+        'adminPanel': 'adminPanelSection',
+        'settings': 'settingsSection'
+    };
+
+    const sectionId = sectionMap[sectionName];
+    if (sectionId) {
+        document.getElementById(sectionId).classList.add('active');
+    }
+
+    // Set active nav button - find the button that was clicked
+    const navButtons = document.querySelectorAll('.nav-btn');
+    navButtons.forEach(btn => {
+        if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(sectionName)) {
+            btn.classList.add('active');
+        }
+    });
+
+    // Load section content
+    switch(sectionName) {
+        case 'dashboard':
+            updateDashboard();
+            break;
+        case 'punchInOut':
+            showPunchSection();
+            break;
+        case 'history':
+            showHistorySection();
+            break;
+        case 'reports':
+            showReportsSection();
+            break;
+        case 'adminPanel':
+            showAdminPanel();
+            break;
+        case 'settings':
+            showSettings();
+            break;
+    }
+}
+
 function showPunchSection() {
     const todayRecord = getTodayAttendance(currentUser.id);
     const canPunchIn = !todayRecord || !todayRecord.punchIn;
