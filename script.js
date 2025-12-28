@@ -282,12 +282,10 @@ function startClock() {
 }
 
 function updateClock() {
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    document.getElementById('currentTime').textContent = `${hours}:${minutes}:${seconds}`;
+    const timeData = getCurrentTime12h();
+    document.getElementById('currentTime').textContent = timeData.formatted;
 
+    const now = new Date();
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
 }
@@ -352,13 +350,13 @@ function updateStats() {
 function updateDashboard() {
     const todayRecord = getTodayAttendance(currentUser.id);
     const statusContent = document.getElementById('todayStatusContent');
-    
+
     if (todayRecord) {
-        statusContent.innerHTML = '<div class="punch-info"><p>Status: ' + (todayRecord.status || 'In Progress') + '</p><p>Punch In: ' + (todayRecord.punchIn || '--') + '</p><p>Punch Out: ' + (todayRecord.punchOut || '--') + '</p></div>';
+        statusContent.innerHTML = '<div class="punch-info"><p>Status: ' + (todayRecord.status || 'In Progress') + '</p><p>Punch In: ' + formatTime12h(todayRecord.punchIn) + '</p><p>Punch Out: ' + formatTime12h(todayRecord.punchOut) + '</p></div>';
     } else {
         statusContent.innerHTML = '<div class="punch-info"><p>Not punched in today</p></div>';
     }
-    
+
     updateHoursSummary();
 }
 
@@ -392,6 +390,29 @@ function formatHours(hours) {
 function formatDateKey(date) {
     const d = new Date(date);
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+// Convert 24h time to 12h format with AM/PM
+function formatTime12h(time24) {
+    if (!time24) return '--';
+    const [hours24, minutes] = time24.split(':').map(Number);
+    const period = hours24 >= 12 ? 'PM' : 'AM';
+    const hours12 = hours24 % 12 || 12;
+    return `${hours12}:${String(minutes).padStart(2, '0')} ${period}`;
+}
+
+// Get current time in 12h format
+function getCurrentTime12h() {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const hours12 = hours % 12 || 12;
+    return {
+        formatted: `${hours12}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} ${period}`,
+        time24: `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+    };
 }
 
 // ============================================
@@ -540,8 +561,8 @@ function loadHistory() {
         html += '<td>' + record.date + '</td>';
         html += '<td>' + record.userName + '</td>';
         html += '<td>' + (record.shift === 'morning' ? 'Morning' : 'Evening') + '</td>';
-        html += '<td>' + (record.punchIn || '--') + '</td>';
-        html += '<td>' + (record.punchOut || '--') + '</td>';
+        html += '<td>' + formatTime12h(record.punchIn) + '</td>';
+        html += '<td>' + formatTime12h(record.punchOut) + '</td>';
         html += '<td>' + formatHours(hours) + '</td>';
         html += '<td><span class="status-badge ' + record.status + '">' + record.status + '</span></td>';
         html += '</tr>';

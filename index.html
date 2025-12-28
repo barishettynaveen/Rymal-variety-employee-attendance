@@ -166,25 +166,32 @@
             <!-- Navigation -->
             <nav class="sidebar-nav">
                 <button class="nav-btn active" onclick="showSection('dashboard')">
-                    <span>Dashboard</span>
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-label">Dashboard</span>
                 </button>
                 <button class="nav-btn" onclick="showSection('punchInOut')" id="punchInOutBtn">
-                    <span>Punch In/Out</span>
+                    <span class="nav-icon">⏰</span>
+                    <span class="nav-label">Punch In/Out</span>
                 </button>
                 <button class="nav-btn" onclick="showSection('history')">
-                    <span>Attendance History</span>
+                    <span class="nav-icon">📅</span>
+                    <span class="nav-label">Attendance History</span>
                 </button>
                 <button class="nav-btn" onclick="showSection('reports')">
-                    <span>Reports</span>
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-label">Reports</span>
                 </button>
                 <button class="nav-btn" onclick="showSection('adminPanel')" id="adminPanelBtn" style="display: none;">
-                    <span>Admin Panel</span>
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-label">Admin Panel</span>
                 </button>
                 <button class="nav-btn" onclick="showSection('settings')">
-                    <span>Settings</span>
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-label">Settings</span>
                 </button>
-                <button class="nav-btn" onclick="handleLogout()">
-                    <span>Logout</span>
+                <button class="nav-btn nav-btn-logout" onclick="handleLogout()">
+                    <span class="nav-icon">🚪</span>
+                    <span class="nav-label">Logout</span>
                 </button>
             </nav>
         </aside>
