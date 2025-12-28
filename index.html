@@ -201,19 +201,26 @@
             <!-- Dashboard Section -->
             <section id="dashboardSection" class="content-section active">
                 <div class="welcome-banner">
-                    <h2>Welcome to Rymal Variety</h2>
-                    <p id="dashboardWelcome">Good day! Track your attendance with ease</p>
+                    <h2>Employee Attendance Dashboard</h2>
+                    <p id="dashboardWelcome">Track your working hours and attendance efficiently</p>
                 </div>
 
                 <!-- Shift Information -->
                 <div class="shift-info">
-                    <div class="shift-card">
-                        <h4>Morning Shift</h4>
-                        <p class="shift-time">7:00 AM - 2:00 PM</p>
+                    <div class="shift-card" onclick="startShift('morning')">
+                        <h4>🌅 Morning Shift</h4>
+                        <p class="shift-time">7:00 AM - 2:00 PM (7 hours)</p>
+                        <p style="font-size: 0.85em; color: #6B7280; margin-top: 8px;">Click to start</p>
                     </div>
-                    <div class="shift-card">
-                        <h4>Evening Shift</h4>
-                        <p class="shift-time">2:00 PM - 10:00 PM</p>
+                    <div class="shift-card" onclick="startShift('evening')">
+                        <h4>🌆 Evening Shift</h4>
+                        <p class="shift-time">2:00 PM - 10:00 PM (8 hours)</p>
+                        <p style="font-size: 0.85em; color: #6B7280; margin-top: 8px;">Click to start</p>
+                    </div>
+                    <div class="shift-card" onclick="startShift('fullday')">
+                        <h4>🌞 Full Day Shift</h4>
+                        <p class="shift-time">7:00 AM - 10:00 PM (15 hours)</p>
+                        <p style="font-size: 0.85em; color: #6B7280; margin-top: 8px;">Click to start</p>
                     </div>
                 </div>
 
@@ -223,7 +230,7 @@
                     <div id="todayStatusContent"></div>
                 </div>
 
-                <!-- Bi-weekly Hours Card -->
+                <!-- Hours Summary -->
                 <div class="hours-summary">
                     <h3>Hours Summary</h3>
                     <div class="hours-cards">
@@ -236,8 +243,31 @@
                             <div class="hours-value" id="weekHours">0:00</div>
                         </div>
                         <div class="hours-card">
-                            <div class="hours-label">Bi-Weekly (14 days)</div>
-                            <div class="hours-value" id="biweeklyHours">0:00</div>
+                            <div class="hours-label">Current Working</div>
+                            <div class="hours-value" id="currentWorking">--:--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bi-Weekly Report -->
+                <div class="hours-summary">
+                    <h3>📊 Bi-Weekly Report (Last 14 Days)</h3>
+                    <div class="hours-cards">
+                        <div class="hours-card">
+                            <div class="hours-label">Morning Hours</div>
+                            <div class="hours-value" id="biweeklyMorning">0:00</div>
+                        </div>
+                        <div class="hours-card">
+                            <div class="hours-label">Evening Hours</div>
+                            <div class="hours-value" id="biweeklyEvening">0:00</div>
+                        </div>
+                        <div class="hours-card">
+                            <div class="hours-label">Full Day Hours</div>
+                            <div class="hours-value" id="biweeklyFullday">0:00</div>
+                        </div>
+                        <div class="hours-card">
+                            <div class="hours-label">Total Hours</div>
+                            <div class="hours-value" id="biweeklyTotal">0:00</div>
                         </div>
                     </div>
                 </div>

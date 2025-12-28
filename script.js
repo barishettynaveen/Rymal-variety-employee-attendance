@@ -299,14 +299,21 @@ function updateCurrentShift() {
     const shiftElement = document.getElementById('currentShift');
 
     if (currentTime >= 7 && currentTime < 14) {
-        shiftElement.textContent = 'Morning Shift (7:00 AM - 2:00 PM)';
-        shiftElement.style.background = 'rgba(33, 150, 243, 0.3)';
+        shiftElement.textContent = '🌅 Morning Shift (7:00 AM - 2:00 PM)';
+        shiftElement.style.background = 'rgba(108, 99, 255, 0.15)';
+        shiftElement.style.borderColor = 'rgba(108, 99, 255, 0.2)';
     } else if (currentTime >= 14 && currentTime < 22) {
-        shiftElement.textContent = 'Evening Shift (2:00 PM - 10:00 PM)';
-        shiftElement.style.background = 'rgba(156, 39, 176, 0.3)';
+        shiftElement.textContent = '🌆 Evening Shift (2:00 PM - 10:00 PM)';
+        shiftElement.style.background = 'rgba(108, 99, 255, 0.15)';
+        shiftElement.style.borderColor = 'rgba(108, 99, 255, 0.2)';
+    } else if (currentTime >= 7 && currentTime < 22) {
+        shiftElement.textContent = '🌞 Full Day Available';
+        shiftElement.style.background = 'rgba(108, 99, 255, 0.15)';
+        shiftElement.style.borderColor = 'rgba(108, 99, 255, 0.2)';
     } else {
         shiftElement.textContent = 'No Active Shift';
-        shiftElement.style.background = 'rgba(255, 255, 255, 0.2)';
+        shiftElement.style.background = 'rgba(108, 99, 255, 0.08)';
+        shiftElement.style.borderColor = 'rgba(108, 99, 255, 0.1)';
     }
 }
 
@@ -352,22 +359,110 @@ function updateDashboard() {
     const statusContent = document.getElementById('todayStatusContent');
 
     if (todayRecord) {
-        statusContent.innerHTML = '<div class="punch-info"><p>Status: ' + (todayRecord.status || 'In Progress') + '</p><p>Punch In: ' + formatTime12h(todayRecord.punchIn) + '</p><p>Punch Out: ' + formatTime12h(todayRecord.punchOut) + '</p></div>';
+        let statusEmoji = '🟡';
+        let statusText = 'Working';
+        if (todayRecord.status === 'complete') {
+            statusEmoji = '🟢';
+            statusText = 'Completed';
+        } else if (!todayRecord.punchOut) {
+            statusEmoji = '🟡';
+            statusText = 'In Progress';
+        } else if (todayRecord.punchIn && !todayRecord.punchOut) {
+            statusEmoji = '🔴';
+            statusText = 'Missed Punch Out';
+        }
+
+        const shiftName = todayRecord.shift === 'morning' ? 'Morning' : todayRecord.shift === 'evening' ? 'Evening' : 'Full Day';
+        const currentHours = calculateHours(todayRecord.punchIn, todayRecord.punchOut || getCurrentTime12h().time24);
+        const expectedHours = todayRecord.shift === 'morning' ? 7 : todayRecord.shift === 'evening' ? 8 : 15;
+        const progress = Math.min((currentHours / expectedHours) * 100, 100);
+
+        statusContent.innerHTML = `
+            <div class="punch-info">
+                <p style="font-size: 1.1em; margin-bottom: 12px;">
+                    <strong>Status:</strong> ${statusEmoji} ${statusText}
+                </p>
+                <p><strong>Shift:</strong> ${shiftName}</p>
+                <p><strong>Punch In:</strong> ${formatTime12h(todayRecord.punchIn)}</p>
+                <p><strong>Punch Out:</strong> ${formatTime12h(todayRecord.punchOut)}</p>
+                ${!todayRecord.punchOut ? `
+                <div style="margin-top: 16px;">
+                    <p style="font-size: 0.9em; color: #6B7280; margin-bottom: 8px;">
+                        ${formatHours(currentHours)} of ${expectedHours} hours completed
+                    </p>
+                    <div style="background: #E5E7EB; border-radius: 10px; height: 10px; overflow: hidden;">
+                        <div style="background: linear-gradient(90deg, #6C63FF, #3F51B5); height: 100%; width: ${progress}%; transition: width 0.3s;"></div>
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+        `;
     } else {
-        statusContent.innerHTML = '<div class="punch-info"><p>Not punched in today</p></div>';
+        statusContent.innerHTML = '<div class="punch-info"><p style="color: #6B7280;">⏱️ Not punched in today - Select a shift above to start</p></div>';
     }
 
     updateHoursSummary();
+    updateCurrentWorkingTime();
 }
 
 function updateHoursSummary() {
-    const today = formatDateKey(new Date());
+    const today = new Date();
+    const todayKey = formatDateKey(today);
     const todayRecord = getTodayAttendance(currentUser.id);
     const todayHours = todayRecord ? calculateHours(todayRecord.punchIn, todayRecord.punchOut || '') : 0;
-    
+
+    // Calculate weekly hours (last 7 days)
+    let weekHours = 0;
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dateKey = formatDateKey(date);
+        const records = attendance.filter(a => a.userId === currentUser.id && a.date === dateKey);
+        records.forEach(r => {
+            weekHours += calculateHours(r.punchIn, r.punchOut || '');
+        });
+    }
+
+    // Calculate bi-weekly hours by shift type (last 14 days)
+    let morningHours = 0;
+    let eveningHours = 0;
+    let fulldayHours = 0;
+
+    for (let i = 0; i < 14; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dateKey = formatDateKey(date);
+        const records = attendance.filter(a => a.userId === currentUser.id && a.date === dateKey);
+        records.forEach(r => {
+            const hours = calculateHours(r.punchIn, r.punchOut || '');
+            if (r.shift === 'morning') morningHours += hours;
+            else if (r.shift === 'evening') eveningHours += hours;
+            else if (r.shift === 'fullday') fulldayHours += hours;
+        });
+    }
+
+    const biweeklyTotal = morningHours + eveningHours + fulldayHours;
+
     document.getElementById('todayHours').textContent = formatHours(todayHours);
-    document.getElementById('weekHours').textContent = '0:00';
-    document.getElementById('biweeklyHours').textContent = '0:00';
+    document.getElementById('weekHours').textContent = formatHours(weekHours);
+    document.getElementById('biweeklyMorning').textContent = formatHours(morningHours);
+    document.getElementById('biweeklyEvening').textContent = formatHours(eveningHours);
+    document.getElementById('biweeklyFullday').textContent = formatHours(fulldayHours);
+    document.getElementById('biweeklyTotal').textContent = formatHours(biweeklyTotal);
+}
+
+function updateCurrentWorkingTime() {
+    const todayRecord = getTodayAttendance(currentUser.id);
+    const currentWorkingEl = document.getElementById('currentWorking');
+
+    if (todayRecord && todayRecord.punchIn && !todayRecord.punchOut) {
+        const currentHours = calculateHours(todayRecord.punchIn, getCurrentTime12h().time24);
+        currentWorkingEl.textContent = formatHours(currentHours);
+        // Update every minute
+        setTimeout(updateCurrentWorkingTime, 60000);
+    } else {
+        currentWorkingEl.textContent = '--:--';
+    }
 }
 
 function calculateHours(punchIn, punchOut) {
@@ -413,6 +508,60 @@ function getCurrentTime12h() {
         formatted: `${hours12}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} ${period}`,
         time24: `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
     };
+}
+
+// ============================================
+// SHIFT MANAGEMENT - AUTO PUNCH IN
+// ============================================
+
+function startShift(shiftType) {
+    const todayRecord = getTodayAttendance(currentUser.id);
+
+    if (todayRecord && todayRecord.punchIn) {
+        alert('You have already punched in today! Please punch out first if you need to change shifts.');
+        return;
+    }
+
+    const shiftNames = {
+        'morning': 'Morning Shift (7:00 AM - 2:00 PM)',
+        'evening': 'Evening Shift (2:00 PM - 10:00 PM)',
+        'fullday': 'Full Day Shift (7:00 AM - 10:00 PM)'
+    };
+
+    const confirmMsg = `Start ${shiftNames[shiftType]}?\n\nThis will automatically punch you in at the current time.`;
+
+    if (confirm(confirmMsg)) {
+        // Update user's shift preference
+        currentUser.shift = shiftType;
+        const userIndex = users.findIndex(u => u.id === currentUser.id);
+        if (userIndex !== -1) {
+            users[userIndex].shift = shiftType;
+            saveUsers();
+            sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+        }
+
+        // Auto punch in
+        const now = new Date();
+        const today = formatDateKey(now);
+        const time = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+
+        attendance.push({
+            id: generateId(),
+            userId: currentUser.id,
+            userName: currentUser.name,
+            date: today,
+            shift: shiftType,
+            punchIn: time,
+            punchOut: null,
+            status: 'incomplete'
+        });
+
+        saveAttendance();
+        updateDashboard();
+        updateStats();
+
+        alert(`✅ Successfully started ${shiftNames[shiftType]}!\nPunched in at ${formatTime12h(time)}`);
+    }
 }
 
 // ============================================
@@ -480,11 +629,18 @@ function showPunchSection() {
     const todayRecord = getTodayAttendance(currentUser.id);
     const canPunchIn = !todayRecord || !todayRecord.punchIn;
     const canPunchOut = todayRecord && todayRecord.punchIn && !todayRecord.punchOut;
-    
-    let html = '<div class="punch-card"><h4>Your Shift: ' + (currentUser.shift === 'morning' ? 'Morning (7AM-2PM)' : 'Evening (2PM-10PM)') + '</h4>';
+
+    let shiftText = '';
+    if (currentUser.shift === 'morning') shiftText = 'Morning (7AM-2PM)';
+    else if (currentUser.shift === 'evening') shiftText = 'Evening (2PM-10PM)';
+    else if (currentUser.shift === 'fullday') shiftText = 'Full Day (7AM-10PM)';
+    else shiftText = 'Not Set';
+
+    let html = '<div class="punch-card"><h4>Your Shift: ' + shiftText + '</h4>';
+    html += '<p style="color: #6B7280; margin-bottom: 20px;">Use the shift cards on the dashboard to start your shift, or manually punch in/out below.</p>';
     html += '<div class="punch-actions"><button class="btn-punch-in" onclick="punchIn()" ' + (!canPunchIn ? 'disabled' : '') + '>Punch In</button>';
     html += '<button class="btn-punch-out" onclick="punchOut()" ' + (!canPunchOut ? 'disabled' : '') + '>Punch Out</button></div></div>';
-    
+
     document.getElementById('punchContent').innerHTML = html;
 }
 
@@ -557,10 +713,14 @@ function loadHistory() {
     
     userRecords.reverse().forEach(record => {
         const hours = calculateHours(record.punchIn, record.punchOut || '');
+        let shiftDisplay = 'Morning';
+        if (record.shift === 'evening') shiftDisplay = 'Evening';
+        else if (record.shift === 'fullday') shiftDisplay = 'Full Day';
+
         html += '<tr>';
         html += '<td>' + record.date + '</td>';
         html += '<td>' + record.userName + '</td>';
-        html += '<td>' + (record.shift === 'morning' ? 'Morning' : 'Evening') + '</td>';
+        html += '<td>' + shiftDisplay + '</td>';
         html += '<td>' + formatTime12h(record.punchIn) + '</td>';
         html += '<td>' + formatTime12h(record.punchOut) + '</td>';
         html += '<td>' + formatHours(hours) + '</td>';
