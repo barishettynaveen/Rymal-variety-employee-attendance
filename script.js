@@ -261,11 +261,9 @@ function showMainApp() {
         document.getElementById('adminPanelBtn').style.display = 'none';
         document.getElementById('quickStats').style.display = 'none';
     }
-    
+
     // Initialize components
     startClock();
-    updateCurrentShift();
-    setInterval(updateCurrentShift, 60000);
     loadAttendance();
     showSection('dashboard');
     updateDashboard();
