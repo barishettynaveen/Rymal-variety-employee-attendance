@@ -288,33 +288,6 @@ function updateClock() {
     document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
 }
 
-function updateCurrentShift() {
-    const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const currentTime = hours + minutes / 60;
-
-    const shiftElement = document.getElementById('currentShift');
-
-    if (currentTime >= 7 && currentTime < 14) {
-        shiftElement.textContent = '🌅 Morning Shift (7:00 AM - 2:00 PM)';
-        shiftElement.style.background = 'rgba(108, 99, 255, 0.15)';
-        shiftElement.style.borderColor = 'rgba(108, 99, 255, 0.2)';
-    } else if (currentTime >= 14 && currentTime < 22) {
-        shiftElement.textContent = '🌆 Evening Shift (2:00 PM - 10:00 PM)';
-        shiftElement.style.background = 'rgba(108, 99, 255, 0.15)';
-        shiftElement.style.borderColor = 'rgba(108, 99, 255, 0.2)';
-    } else if (currentTime >= 7 && currentTime < 22) {
-        shiftElement.textContent = '🌞 Full Day Available';
-        shiftElement.style.background = 'rgba(108, 99, 255, 0.15)';
-        shiftElement.style.borderColor = 'rgba(108, 99, 255, 0.2)';
-    } else {
-        shiftElement.textContent = 'No Active Shift';
-        shiftElement.style.background = 'rgba(108, 99, 255, 0.08)';
-        shiftElement.style.borderColor = 'rgba(108, 99, 255, 0.1)';
-    }
-}
-
 // ============================================
 // ATTENDANCE & STATS
 // ============================================
